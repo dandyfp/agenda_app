@@ -95,7 +95,16 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getDetailAgenda(int id) async {
     Database db = await database;
     return await db.query(
-      'user',
+      'agenda',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> deleteAgenda(int id) async {
+    Database db = await database;
+    return await db.delete(
+      'agenda',
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -123,7 +132,7 @@ class DatabaseHelper {
   Future<int> updateAgenda(Agenda agenda) async {
     Database db = await database;
     return await db.update(
-      'user',
+      'agenda',
       {
         'title': agenda.title,
         'description': agenda.description,
@@ -135,5 +144,11 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [agenda.id],
     );
+  }
+
+  Future<void> dropTable() async {
+    if (_database != null) {
+      await _database!.execute('DELETE FROM agenda');
+    }
   }
 }

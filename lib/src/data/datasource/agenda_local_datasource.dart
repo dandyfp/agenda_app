@@ -46,4 +46,14 @@ class AgendaLocalDatasource implements AgendaRepository {
       return left('Failed add agenda');
     }
   }
+
+  @override
+  Future<Either<String, Agenda>> removeAgenda(int id) async {
+    try {
+      await _databaseHelper.deleteAgenda(id);
+      return right(const Agenda());
+    } catch (e) {
+      return left('Failed add agenda');
+    }
+  }
 }

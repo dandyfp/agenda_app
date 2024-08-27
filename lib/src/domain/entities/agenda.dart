@@ -17,7 +17,7 @@ class Agenda with _$Agenda {
   }) = _Agenda;
 
   factory Agenda.fromJSON(Map<String, dynamic> json) {
-    Uint8List image = json["imagePath"];
+    Uint8List? image = json["imagePath"];
 
     return Agenda(
       id: json["id"],

@@ -4,9 +4,13 @@ import 'package:agenda_app/src/domain/entities/user.dart';
 import 'package:agenda_app/src/presentation/misc/constant.dart';
 import 'package:agenda_app/src/presentation/misc/date_format.dart';
 import 'package:agenda_app/src/presentation/misc/methods.dart';
+import 'package:agenda_app/src/presentation/misc/navigator_helper.dart';
+import 'package:agenda_app/src/presentation/misc/validator.dart';
+import 'package:agenda_app/src/presentation/pages/home/home_page.dart';
 import 'package:agenda_app/src/presentation/providers/user_data/user_data_provider.dart';
 import 'package:agenda_app/src/presentation/widgets/button.dart';
 import 'package:agenda_app/src/presentation/widgets/textfield.dart';
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,6 +30,8 @@ TextEditingController emailController = TextEditingController();
 TextEditingController dateOfBirthController = TextEditingController();
 TextEditingController genderController = TextEditingController();
 TextEditingController photoProfileController = TextEditingController();
+
+GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   File? imageFile;
@@ -66,144 +72,161 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: ListView(
-          children: [
-            verticalSpace(30),
-            KTextField(
-              label: 'First Name',
-              maxLines: 1,
-              minLines: 1,
-              controller: firstNameController,
-              keyboardType: TextInputType.name,
-              textInputAction: TextInputAction.next,
-              borderColor: Colors.grey,
-            ),
-            verticalSpace(20),
-            KTextField(
-              label: 'Last Name',
-              maxLines: 1,
-              minLines: 1,
-              controller: lastNameController,
-              keyboardType: TextInputType.name,
-              textInputAction: TextInputAction.next,
-              borderColor: Colors.grey,
-            ),
-            verticalSpace(20),
-            KTextField(
-              label: 'Email',
-              maxLines: 1,
-              minLines: 1,
-              controller: emailController,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              borderColor: Colors.grey,
-            ),
-            verticalSpace(20),
-            KTextField(
-              label: 'Date Of Birth',
-              maxLines: 1,
-              minLines: 1,
-              isOption: true,
-              controller: dateOfBirthController,
-              keyboardType: TextInputType.name,
-              textInputAction: TextInputAction.next,
-              borderColor: Colors.grey,
-              suffixIcon: Container(
-                decoration: BoxDecoration(
-                  color: saffron,
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-                child: const Icon(Icons.calendar_month),
+        child: Form(
+          key: formKey,
+          child: ListView(
+            children: [
+              verticalSpace(30),
+              KTextField(
+                label: 'First Name',
+                maxLines: 1,
+                minLines: 1,
+                controller: firstNameController,
+                keyboardType: TextInputType.name,
+                textInputAction: TextInputAction.next,
+                borderColor: Colors.grey,
+                validator: Validator.requiredValidator.call,
               ),
-              onTap: () {
-                showDatePicker(context);
-              },
-            ),
-            verticalSpace(20),
-            KTextField(
-              label: 'Gender',
-              maxLines: 1,
-              minLines: 1,
-              controller: genderController,
-              keyboardType: TextInputType.name,
-              textInputAction: TextInputAction.next,
-              borderColor: Colors.grey,
-            ),
-            verticalSpace(20),
-            KTextField(
-              label: 'Photo Profile',
-              maxLines: 1,
-              minLines: 1,
-              isOption: true,
-              controller: photoProfileController,
-              keyboardType: TextInputType.name,
-              textInputAction: TextInputAction.go,
-              borderColor: Colors.grey,
-              suffixIcon: Container(
-                decoration: BoxDecoration(
-                  color: saffron,
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-                child: const Icon(Icons.upload),
+              verticalSpace(20),
+              KTextField(
+                label: 'Last Name',
+                maxLines: 1,
+                minLines: 1,
+                controller: lastNameController,
+                keyboardType: TextInputType.name,
+                textInputAction: TextInputAction.next,
+                borderColor: Colors.grey,
+                validator: Validator.requiredValidator.call,
               ),
-              onTap: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (context) => Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 30,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  pickImage(ImageSource.camera);
-                                },
-                                icon: const Icon(
-                                  Icons.camera_alt_outlined,
-                                  size: 45,
+              verticalSpace(20),
+              KTextField(
+                label: 'Email',
+                maxLines: 1,
+                minLines: 1,
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.next,
+                borderColor: Colors.grey,
+                validator: Validator.emailValidator.call,
+              ),
+              verticalSpace(20),
+              KTextField(
+                label: 'Date Of Birth',
+                maxLines: 1,
+                minLines: 1,
+                isOption: true,
+                controller: dateOfBirthController,
+                keyboardType: TextInputType.name,
+                textInputAction: TextInputAction.next,
+                borderColor: Colors.grey,
+                validator: Validator.requiredValidator.call,
+                suffixIcon: Container(
+                  decoration: BoxDecoration(
+                    color: saffron,
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  child: const Icon(Icons.calendar_month),
+                ),
+                onTap: () {
+                  showDatePicker(context);
+                },
+              ),
+              verticalSpace(20),
+              KTextField(
+                label: 'Gender',
+                maxLines: 1,
+                minLines: 1,
+                controller: genderController,
+                keyboardType: TextInputType.name,
+                textInputAction: TextInputAction.next,
+                borderColor: Colors.grey,
+                validator: Validator.requiredValidator.call,
+              ),
+              verticalSpace(20),
+              KTextField(
+                label: 'Photo Profile',
+                maxLines: 1,
+                minLines: 1,
+                isOption: true,
+                controller: photoProfileController,
+                keyboardType: TextInputType.name,
+                textInputAction: TextInputAction.go,
+                borderColor: Colors.grey,
+                suffixIcon: Container(
+                  decoration: BoxDecoration(
+                    color: saffron,
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  child: const Icon(Icons.upload),
+                ),
+                validator: Validator.requiredValidator.call,
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) => Container(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 30,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    pickImage(ImageSource.camera);
+                                  },
+                                  icon: const Icon(
+                                    Icons.camera_alt_outlined,
+                                    size: 45,
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                onPressed: () {
-                                  pickImage(ImageSource.gallery);
-                                },
-                                icon: const Icon(
-                                  Icons.photo_size_select_actual_rounded,
-                                  size: 45,
-                                ),
-                              )
-                            ],
-                          ),
-                        ));
-              },
-            ),
-            verticalSpace(40),
-            Button(
-              onPressed: () {
-                User user = User(
-                  firstName: firstNameController.text,
-                  lastName: lastNameController.text,
-                  email: emailController.text,
-                  dateOfBirth: dateOfBirthController.text,
-                  gender: genderController.text,
-                  id: userData?.id,
-                  imagePath: bytes?.toList(),
-                );
-                ref.read(userDataProviderProvider.notifier).updateData(user);
-              },
-              child: const Center(
-                child: Text(
-                  'Save',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: ghostWhite,
+                                IconButton(
+                                  onPressed: () {
+                                    pickImage(ImageSource.gallery);
+                                  },
+                                  icon: const Icon(
+                                    Icons.photo_size_select_actual_rounded,
+                                    size: 45,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ));
+                },
+              ),
+              verticalSpace(40),
+              Button(
+                onPressed: () {
+                  User user = User(
+                    firstName: firstNameController.text,
+                    lastName: lastNameController.text,
+                    email: emailController.text,
+                    dateOfBirth: dateOfBirthController.text,
+                    gender: genderController.text,
+                    id: userData?.id,
+                    imagePath: bytes?.toList(),
+                  );
+                  if (formKey.currentState?.validate() ?? false) {
+                    ref
+                        .read(userDataProviderProvider.notifier)
+                        .updateData(user);
+                    AnimatedSnackBar.material('Success save data',
+                            type: AnimatedSnackBarType.success)
+                        .show(context);
+                    NavigatorHelper.pushReplacement(context, const HomePage());
+                  }
+                },
+                child: const Center(
+                  child: Text(
+                    'Save',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: ghostWhite,
+                    ),
                   ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -237,6 +260,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SfDateRangePicker(
+              showActionButtons: true,
               onSelectionChanged: (DateRangePickerSelectionChangedArgs value) {
                 dateOfBirthController.text = FormatDate().formatDate(
                     value.value.toString(),
@@ -250,14 +274,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
               selectionMode: DateRangePickerSelectionMode.single,
               confirmText: 'Save',
               cancelText: 'Cancel',
-              onCancel: () => Navigator.pop,
+              onCancel: () => Navigator.pop(context),
               onSubmit: (value) {
                 dateOfBirthController.text = FormatDate().formatDate(
                     value.toString(),
                     context: context,
                     format: 'dd MMMM yyyy');
 
-                setState(() {});
+                setState(() {
+                  Navigator.pop(context);
+                });
               },
             ),
           ],

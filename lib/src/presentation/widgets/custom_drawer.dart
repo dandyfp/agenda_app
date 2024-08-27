@@ -1,14 +1,19 @@
 import 'dart:typed_data';
 
+import 'package:agenda_app/src/data/datasource/db_helper.dart';
 import 'package:agenda_app/src/domain/entities/user.dart';
 import 'package:agenda_app/src/presentation/misc/constant.dart';
 import 'package:agenda_app/src/presentation/misc/methods.dart';
 import 'package:agenda_app/src/presentation/misc/navigator_helper.dart';
+import 'package:agenda_app/src/presentation/pages/auth/login_page.dart';
 import 'package:agenda_app/src/presentation/pages/profile/edit_profile.dart';
 import 'package:agenda_app/src/presentation/providers/user_data/user_data_provider.dart';
 import 'package:agenda_app/src/presentation/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
 
 class CustomDrawer extends ConsumerWidget {
   const CustomDrawer({
@@ -141,10 +146,41 @@ class CustomDrawer extends ConsumerWidget {
                   ),
                 ),
               ),
+            ),
+            verticalSpace(10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Button(
+                color: ghostWhite,
+                border: Border.all(color: saffron),
+                onPressed: () {
+                  clearSession();
+
+                  NavigatorHelper.pushAndRemoveUntil(
+                    context,
+                    const LoginPage(),
+                    (route) => false,
+                  );
+                },
+                child: const Center(
+                  child: Text(
+                    'Logout',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: saffron,
+                    ),
+                  ),
+                ),
+              ),
             )
           ],
         ),
       ),
     );
+  }
+
+  Future<void> clearSession() async {
+    await asyncPrefs.clear();
+    await DatabaseHelper().dropTable();
   }
 }

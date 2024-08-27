@@ -9,8 +9,8 @@ part 'get_list_agenda_data_provider.g.dart';
 class GetListAgendaData extends _$GetListAgendaData {
   @override
   Future<List<Agenda>> build() async {
-    GetListAgenda getList = ref.read(getListAgendaProvider);
     state = const AsyncLoading();
+    GetListAgenda getList = ref.read(getListAgendaProvider);
     var result = await getList.execute();
     return result.fold(
       (l) {

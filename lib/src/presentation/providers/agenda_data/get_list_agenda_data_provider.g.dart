@@ -6,7 +6,7 @@ part of 'get_list_agenda_data_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$getListAgendaDataHash() => r'68196e423d5e96620453f6bd66182b1ed4fa48ee';
+String _$getListAgendaDataHash() => r'd9e8b419a03da334389bb72d1cc0b0e91fca175b';
 
 /// See also [GetListAgendaData].
 @ProviderFor(GetListAgendaData)

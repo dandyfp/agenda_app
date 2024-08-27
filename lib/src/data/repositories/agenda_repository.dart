@@ -5,5 +5,6 @@ abstract class AgendaRepository {
   Future<Either<String, Agenda>> createAgenda(Agenda agenda);
   Future<Either<String, Agenda>> updateAgenda(Agenda agenda);
   Future<Either<String, Agenda>> getDetail(int id);
+  Future<Either<String, Agenda>> removeAgenda(int id);
   Future<Either<String, List<Agenda>>> getListAgenda();
 }

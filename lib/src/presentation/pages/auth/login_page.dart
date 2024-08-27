@@ -7,6 +7,7 @@ import 'package:agenda_app/src/presentation/pages/home/home_page.dart';
 import 'package:agenda_app/src/presentation/providers/user_data/user_data_provider.dart';
 import 'package:agenda_app/src/presentation/widgets/button.dart';
 import 'package:agenda_app/src/presentation/widgets/textfield.dart';
+import 'package:animated_snack_bar/animated_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,7 +45,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
-  goToHome() => NavigatorHelper.push(context, const HomePage());
+  goToHome() => NavigatorHelper.pushReplacement(context, const HomePage());
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +58,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Image.asset(
+                height: 200,
+                width: 200,
+                'assets/logo.png',
+              ),
+              verticalSpace(20),
               KTextField(
                 maxLines: 1,
                 minLines: 1,
@@ -101,9 +108,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     password: '-',
                   );
                   if (formKey.currentState?.validate() ?? false) {
-                    setBool();
-                    ref.read(userDataProviderProvider.notifier).create(user);
-                    NavigatorHelper.push(context, const HomePage());
+                    if (emailController.text ==
+                            'candidate@deptechdigital.com' &&
+                        passwordController.text == 'testInterview123!') {
+                      setBool();
+                      ref.read(userDataProviderProvider.notifier).create(user);
+                      NavigatorHelper.pushAndRemoveUntil(
+                        context,
+                        const HomePage(),
+                        (route) => false,
+                      );
+                    } else {
+                      AnimatedSnackBar.material(
+                        'Wrong email or password',
+                        type: AnimatedSnackBarType.warning,
+                      ).show(context);
+                    }
                   }
                 },
                 child: const Center(
@@ -116,6 +136,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                 ),
               ),
+              verticalSpace(20),
+              TextButton(
+                onPressed: () =>
+                    NavigatorHelper.pushReplacement(context, const HomePage()),
+                child: const Text(
+                  'Skip',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              )
             ],
           ),
         ),
