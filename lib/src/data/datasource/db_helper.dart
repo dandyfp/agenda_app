@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:agenda_app/src/domain/entities/agenda.dart';
 import 'package:agenda_app/src/domain/entities/user.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -45,13 +46,14 @@ class DatabaseHelper {
 
     // Create the 'agenda' table
     await db.execute('''
-      CREATE TABLE agenda (
+      CREATE TABLE agenda(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT,
         description TEXT,
-        date TEXT,
-        userId INTEGER,
-        FOREIGN KEY (userId) REFERENCES user (id)
+        dateTimeAgenda TEXT,
+        timeReminder TEXT,
+        imageName TEXT,
+        imagePath BLOB
       )
     ''');
   }
@@ -88,5 +90,50 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getUsers() async {
     Database db = await database;
     return await db.query('user');
+  }
+
+  Future<List<Map<String, dynamic>>> getDetailAgenda(int id) async {
+    Database db = await database;
+    return await db.query(
+      'user',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getListAgenda() async {
+    Database db = await database;
+    return await db.query(
+      'agenda',
+    );
+  }
+
+  Future<int> insertAgenda(Agenda agenda) async {
+    Database db = await database;
+    return await db.insert('agenda', {
+      'title': agenda.title,
+      'description': agenda.description,
+      'dateTimeAgenda': agenda.dateTime,
+      'timeReminder': agenda.timeReminder,
+      'imageName': agenda.imageName,
+      'imagePath': Uint8List.fromList(agenda.imagePath ?? []),
+    });
+  }
+
+  Future<int> updateAgenda(Agenda agenda) async {
+    Database db = await database;
+    return await db.update(
+      'user',
+      {
+        'title': agenda.title,
+        'description': agenda.description,
+        'dateTimeAgenda': agenda.dateTime,
+        'timeReminder': agenda.timeReminder,
+        'imageName': agenda.imageName,
+        'imagePath': Uint8List.fromList(agenda.imagePath ?? []),
+      },
+      where: 'id = ?',
+      whereArgs: [agenda.id],
+    );
   }
 }

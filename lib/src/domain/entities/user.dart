@@ -18,7 +18,7 @@ class User with _$User {
   }) = _User;
 
   factory User.fromJSON(Map<String, dynamic> json) {
-    Uint8List image = json["imagePath"];
+    Uint8List? image = json["imagePath"];
     return User(
       firstName: json["firstName"],
       lastName: json["lastName"],
@@ -26,7 +26,7 @@ class User with _$User {
       email: json["email"],
       dateOfBirth: json["dateOfBirth"],
       id: json["id"],
-      imagePath: image.toList(),
+      imagePath: image?.toList(),
     );
   }
 }

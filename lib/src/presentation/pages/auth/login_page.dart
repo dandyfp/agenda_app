@@ -2,12 +2,14 @@ import 'package:agenda_app/src/domain/entities/user.dart';
 import 'package:agenda_app/src/presentation/misc/constant.dart';
 import 'package:agenda_app/src/presentation/misc/methods.dart';
 import 'package:agenda_app/src/presentation/misc/navigator_helper.dart';
+import 'package:agenda_app/src/presentation/misc/validator.dart';
 import 'package:agenda_app/src/presentation/pages/home/home_page.dart';
 import 'package:agenda_app/src/presentation/providers/user_data/user_data_provider.dart';
 import 'package:agenda_app/src/presentation/widgets/button.dart';
 import 'package:agenda_app/src/presentation/widgets/textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -21,8 +23,29 @@ TextEditingController passwordController = TextEditingController();
 
 GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+final SharedPreferencesAsync asyncPrefs = SharedPreferencesAsync();
+
 class _LoginPageState extends ConsumerState<LoginPage> {
   bool isObscure = true;
+  bool? isLogin;
+
+  @override
+  void initState() {
+    checkState();
+    super.initState();
+  }
+
+  checkState() async {
+    await getBool();
+    if (isLogin == true) {
+      setState(() {
+        Future.delayed(Durations.medium1, () => goToHome());
+      });
+    }
+  }
+
+  goToHome() => NavigatorHelper.push(context, const HomePage());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,6 +65,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
                 controller: emailController,
+                validator: Validator.emailValidator.call,
               ),
               verticalSpace(20),
               KTextField(
@@ -53,6 +77,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 textInputAction: TextInputAction.go,
                 controller: passwordController,
                 obscure: isObscure,
+                validator: Validator.passwordValidator.call,
                 suffixIcon: InkWell(
                   onTap: () => setState(
                     () {
@@ -75,10 +100,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     gender: '-',
                     password: '-',
                   );
-                  if (ref.watch(userDataProviderProvider).value == null) {
+                  if (formKey.currentState?.validate() ?? false) {
+                    setBool();
                     ref.read(userDataProviderProvider.notifier).create(user);
-                    NavigatorHelper.push(context, const HomePage());
-                  } else {
                     NavigatorHelper.push(context, const HomePage());
                   }
                 },
@@ -97,5 +121,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ),
       ),
     );
+  }
+
+  Future<void> setBool() async {
+    await asyncPrefs.setBool('login', true);
+  }
+
+  Future<void> getBool() async {
+    isLogin = await asyncPrefs.getBool('login');
   }
 }
